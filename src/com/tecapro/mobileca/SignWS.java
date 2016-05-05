@@ -30,10 +30,19 @@ import com.viettel.mobileca.signature.xml.XmlDigitalSignature;
  */
 @Path("/sign")
 public class SignWS {
-
 	String certString =null;
 	String vtCertString =null;
 	String b64File1=null;
+
+	@Path("getUserCert/{phoneNumber}")
+	@GET
+	@Produces({ MediaType.TEXT_PLAIN })
+	public String getUserCert(@PathParam("phoneNumber") String phoneNumber)
+			throws Exception {
+		String userCertString = APQueryCertificate.onProcess(phoneNumber);
+		return userCertString;
+	}
+	
 	@Path("signpdf/{phoneNumber}/{b64File}")
 	@GET
 	@Produces({ MediaType.TEXT_PLAIN })
@@ -41,7 +50,7 @@ public class SignWS {
 			throws Exception {
 		// NOTE DANG TRUYEN THANG b64FILE1 de test
 		
-		/* b64File1 = FileAction.fileEncode(System.getProperty("catalina.base" )+"/wtpwebapps/MobileCA-WS/etc/Tich hop CA.pdf");*/
+		b64File1 = FileAction.fileEncode(System.getProperty("catalina.base" )+"/wtpwebapps/MobileCA-WS/etc/Tich hop CA.pdf");
 		 
 		certString = APQueryCertificate.onProcess(phoneNumber);
 
@@ -53,7 +62,7 @@ public class SignWS {
 				.generateCertificate(new ByteArrayInputStream(Base64.decode(vtCertString.getBytes())));
 		Certificate[] chain = new Certificate[] { userCert, viettelCert };
 		SignFilePlugin sfp = new SignPdfPlugin();
-		String filePath = FileAction.saveFile(b64File, Variables.TYPE_PDF); //thay b64File1 de test
+		String filePath = FileAction.saveFile(b64File1, Variables.TYPE_PDF); //thay b64File1 de test
 		String hash = sfp.createHash(filePath, chain);
 		String sig = APSignature.onProcess(hash);
 		String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT, Variables.TYPE_PDF);
