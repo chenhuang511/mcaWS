@@ -1,0 +1,270 @@
+<config>
+    <!-- Config threads -->
+    <threads>
+        <selectSubCaThread>
+            <sleepTime unit='miliseconds'>600000</sleepTime>
+            <numberThread>1</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </selectSubCaThread>
+		
+        <insertSubCaChargeThread>
+            <sleepTime unit='miliseconds'>100</sleepTime>
+            <numberThread>5</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </insertSubCaChargeThread>
+		
+        <dbScanThread>
+            <sleepTime unit='miliseconds'>600000</sleepTime>
+            <numberThread>1</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </dbScanThread>
+		
+        <dailyChargeThread>
+            <sleepTime unit='miliseconds'>100</sleepTime>
+            <numberThread>5</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </dailyChargeThread>
+		
+        <mtSenderThread>
+            <sleepTime unit='miliseconds'>1800000</sleepTime>
+            <numberThread>1</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </mtSenderThread>
+		
+        <smsSelectSubCaThread>
+            <sleepTime unit='miliseconds'>100</sleepTime>
+            <numberThread>1</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </smsSelectSubCaThread>
+		
+        <smsChargeThread>
+            <sleepTime unit='miliseconds'>100</sleepTime>
+            <numberThread>5</numberThread>
+            <numberOfQueues>50</numberOfQueues>
+        </smsChargeThread>
+    </threads>
+	
+    <!-- Config charge amount -->
+    <chargeAmount>
+        <individual custType = "1-ca nhan">
+            <type>1</type>
+            <money>70000</money>
+        </individual>	
+        <business custType = "2-Doanh nghiep">
+            <type>2</type>
+            <money>30000</money>
+        </business>
+    </chargeAmount>
+	
+    <!-- Config arguments connect system VAS charging gateway -->
+    <vcgwBusiness>
+        <url>http://10.60.15.217:8101/process/services/ProcessClients?wsdl</url>
+        <username>8efa641eda8c1c98</username>
+        <password>b6c348a3a4ed93660eef71859b1ebf31</password>
+        <providerId>TESTBED</providerId>
+        <serviceId>TESTSV</serviceId>
+        <cmd>DOWNLOAD</cmd>
+        <content>GAME|DOWNLOAD</content>
+        <success comment="response when success">0</success>
+        <exception comment="response when not connect or exception">99</exception>
+    </vcgwBusiness>
+	
+    <vcgwPersonal>
+        <url>http://10.60.15.217:8101/process/services/ProcessClients?wsdl</url>
+        <username>8efa641eda8c1c98</username>
+        <password>b6c348a3a4ed93660eef71859b1ebf31</password>
+        <providerId>TESTBED</providerId>
+        <serviceId>TESTSV</serviceId>
+        <cmd>DOWNLOAD</cmd>
+        <content>GAME|DOWNLOAD</content>
+        <success comment="response when success">0</success>
+        <exception comment="response when not connect or exception">99</exception>
+    </vcgwPersonal>
+    <!-- Config arguments connect system SMS gateway -->
+    <smsgw>
+        <url>http://10.60.15.146:8015/vasp/Service.asmx</url>
+        <username>8a3d2658dafa96bb</username>
+        <password>8a3d2658dafa96bb</password>
+        <sender>9094</sender>
+        <syntaxSmsMO>TTCA</syntaxSmsMO>
+    </smsgw>
+	
+    <!-- Config arguments connect system RA-MSSP -->
+    <raMssp>
+        <url>http://10.60.15.217:8085/raws.asmx?wsdl</url>
+        <success comment="response when success">00</success>
+        <exception comment="response when not connect or exception">98</exception>
+    </raMssp>
+    <!-- Config arguments publish ws charging -->
+    <chargws>
+        <url>
+            http://0.0.0.0:8088/chargws.asmx?wsdl
+        </url>
+        <success comment="response when success">
+            00
+        </success>
+        <fail comment="response when error">
+            99
+        </fail>
+    </chargws>
+    <!-- Config arguments ws bccs -->
+    <bccs>
+        <url>
+            http://10.60.34.8:8007/WS_CA/CheckCaApprove?wsdl
+        </url>
+        <success comment="response when sucess">
+            00
+        </success>
+        <pending>
+            01
+        </pending>
+        <fail comment="response when error">
+            99
+        </fail>
+    </bccs>
+    <!-- Config command SQL -->
+    <sql>
+        <lstError>SELECT * FROM LST_ERROR</lstError>
+        <lstSmsContent>SELECT * FROM SMS_CHARGE_MOBILE_CA</lstSmsContent>
+        <getMaxSubCaId>
+            SELECT max(s.SUB_ID) as max_subId 
+            FROM SUB_CA s, CUSTOMER_CA c 
+            WHERE s.CUST_ID = c.CUST_ID AND s.STATUS = 2 AND (s.ACT_STATUS = 00 OR s.ACT_STATUS = 01) 
+            AND s.END_EFFECT_DATE > SYSDATE AND s.ISDN IS NOT NULL AND s.PAY_METHOD = 2 AND s.EQUIPMENT_TYPE = 2 
+            ORDER BY s.SUB_ID ASC 
+        </getMaxSubCaId>
+        <getMaxSubCaIdCharge>SELECT max(SUB_ID)as max_sub_id FROM SUB_CA_CHARGE</getMaxSubCaIdCharge>
+        <getSubCaCharge>
+            SELECT c.SUB_ID, c.CUST_ID, c.CUST_TYPE, c.COUNT_FAIL, s.ISDN, s.SERIAL_CTS, c.NEXT_CHARGE 
+            FROM SUB_CA_CHARGE c, SUB_CA s 
+            WHERE c.SUB_ID = s.SUB_ID AND s.STATUS = 2 AND (s.ACT_STATUS = 00 OR s.ACT_STATUS = 01) 
+            AND s.END_EFFECT_DATE > SYSDATE AND s.ISDN IS NOT NULL AND s.PAY_METHOD = 2 AND s.EQUIPMENT_TYPE = 2 
+            AND c.NEXT_CHARGE &lt;= SYSDATE AND c.COUNT_FAIL &lt; 60 ORDER BY c.SUB_ID ASC
+        </getSubCaCharge>
+        <getSendMt>
+            SELECT MT_ID, MSISDN, MSG_CONTENT, SUB_ID, VC_REQUEST_ID, SEND_STATUS, SEND_RESULT, INSERT_TIME 
+            FROM MT_CHARGE_MOBILE_CA WHERE SEND_STATUS = 0 AND INSERT_TIME > (SYSDATE-2) 
+        </getSendMt>
+        <insertMsspLog>
+            INSERT INTO MSSP_LOG(REQUEST_ID, MSISDN, PROCESS_CODE, REQ_TIME, SUB_ID, VC_REQUEST_ID) VALUES (?,?,?,?,?,?) 
+        </insertMsspLog>
+        <updateMsspLog>
+            UPDATE MSSP_LOG SET ERR_CODE = ?, ERR_DESC = ?, RES_TIME = ? WHERE REQUEST_ID = ?
+        </updateMsspLog>
+        <insertMsspStatus>
+            INSERT INTO MSSP_STATUS(ISDN, START_DATE, MSSP_STATUS) VALUES(?,?,?)
+        </insertMsspStatus>
+        <getMsspStatusByIsdn>
+            SELECT ISDN, START_DATE, END_DATE, MSSP_STATUS, OLD_STATUS FROM MSSP_STATUS WHERE ISDN = ?
+        </getMsspStatusByIsdn>
+        <updateMsspStatusByIsdn>
+            UPDATE MSSP_STATUS SET MSSP_STATUS = ?, OLD_STATUS = ?, END_DATE = ? WHERE ISDN = ?
+        </updateMsspStatusByIsdn>
+        <insertMt>
+            INSERT INTO MT_CHARGE_MOBILE_CA(MT_ID, MSISDN, MSG_CONTENT, SUB_ID, VC_REQUEST_ID, SEND_STATUS, INSERT_TIME) VALUES (?,?,?,?,?,?,?)
+        </insertMt>
+        <updateMt>
+            UPDATE MT_CHARGE_MOBILE_CA SET SEND_STATUS = ?, SEND_TIME = ?, SEND_RESULT = ? WHERE MT_ID = ?
+        </updateMt>
+        <getSubCa>
+            SELECT s.SUB_ID, s.CUST_ID, s.ISDN, s.SERIAL_CTS, s.STA_DATETIME, c.CUST_TYPE, s.END_EFFECT_DATE FROM SUB_CA s, CUSTOMER_CA c 
+            WHERE s.CUST_ID = c.CUST_ID AND s.STATUS = 2 AND (s.ACT_STATUS = 00 OR s.ACT_STATUS = 01) 
+            AND s.END_EFFECT_DATE > SYSDATE AND s.ISDN IS NOT NULL 
+            AND s.PAY_METHOD = 2 AND s.EQUIPMENT_TYPE = 2 
+            AND s.SUB_ID > ? AND s.SUB_ID &lt;= ? 
+            ORDER BY s.SUB_ID ASC
+        </getSubCa>
+        <getSubCaChargeByIsdn>
+            SELECT s.SUB_ID, s.CUST_ID, s.ISDN, s.SERIAL_CTS, s.STA_DATETIME, c.CUST_TYPE, s.END_EFFECT_DATE, sc.NEXT_CHARGE, sc.COUNT_FAIL 
+            FROM SUB_CA s, CUSTOMER_CA c, SUB_CA_CHARGE sc 
+            WHERE s.CUST_ID = c.CUST_ID 
+            AND sc.SUB_ID = s.SUB_ID 
+            AND s.STATUS = 2 AND (s.ACT_STATUS = 00 OR s.ACT_STATUS = 01) 
+            AND s.END_EFFECT_DATE > SYSDATE AND s.ISDN like ? 
+            AND s.PAY_METHOD = 2 AND s.EQUIPMENT_TYPE = 2 
+            ORDER BY s.SUB_ID ASC
+        </getSubCaChargeByIsdn>
+        <insertSubCaCharge>
+            INSERT INTO SUB_CA_CHARGE(SUB_ID, CUST_ID, CUST_TYPE, NEXT_CHARGE) VALUES(?,?,?,ADD_MONTHS(?,1))
+        </insertSubCaCharge>
+        <getPaymentStatusCTS>
+            SELECT count(*) as count FROM SUB_CA_CHARGE sc, SUB_CA s 
+            WHERE sc.SUB_ID = s.SUB_ID 
+            AND sc.NEXT_CHARGE &lt;= SYSDATE AND s.ISDN = ? 
+            ORDER BY s.SUB_ID ASC
+        </getPaymentStatusCTS>
+        <updateCountFailSubCaCharge>
+            UPDATE SUB_CA_CHARGE SET COUNT_FAIL = ? WHERE SUB_ID = ?
+        </updateCountFailSubCaCharge>
+        <updateNewNextCharge>
+            UPDATE SUB_CA_CHARGE SET NEXT_CHARGE = ADD_MONTHS(?,1), COUNT_FAIL = ? WHERE SUB_ID = ?
+        </updateNewNextCharge>
+        <getNewNextChargeBySubId>
+            SELECT NEXT_CHARGE FROM SUB_CA_CHARGE WHERE SUB_ID = ?
+        </getNewNextChargeBySubId>
+        <insertVcLog>
+            INSERT INTO VC_LOG(REQUEST_ID, MSISDN, CHARG_AMOUNT, REQ_TIME, USER_NAME, CMD, CONTENT, SUB_ID, EVENT_TYPE) VALUES (?,?,?,?,?,?,?,?,?)
+        </insertVcLog>
+        <updateVcLog>
+            UPDATE VC_LOG SET ERR_CODE = ?, ERR_DESC = ?, RES_TIME = ? WHERE REQUEST_ID = ?
+        </updateVcLog>
+        <getSubCaChargeByIsdnAndSerial>
+            SELECT s.SUB_ID, s.CUST_ID, s.ISDN, s.SERIAL_CTS, s.STA_DATETIME, c.CUST_TYPE, s.END_EFFECT_DATE, sc.NEXT_CHARGE, sc.COUNT_FAIL 
+            FROM SUB_CA s, CUSTOMER_CA c, SUB_CA_CHARGE sc 
+            WHERE s.CUST_ID = c.CUST_ID 
+            AND sc.SUB_ID = s.SUB_ID 
+            AND s.STATUS = 2 AND (s.ACT_STATUS = 00 OR s.ACT_STATUS = 01) 
+            AND s.END_EFFECT_DATE > SYSDATE AND s.ISDN like ? AND s.SERIAL_CTS = ?
+            AND s.PAY_METHOD = 2 AND s.EQUIPMENT_TYPE = 2 
+            ORDER BY s.SUB_ID ASC
+        </getSubCaChargeByIsdnAndSerial>
+        <insertBccsChargeLog>
+            INSERT INTO BCCS_CHARGE_LOG(BCCS_ID, SUB_ID, MSISDN, CERT_SERIAL, PROCESS_CODE, REQ_TIME, ERR_CODE, ERR_DESC) VALUES (?,?,?,?,?,?,?,?)
+        </insertBccsChargeLog>
+        <updateBccsChargeLog>
+            UPDATE BCCS_CHARGE_LOG SET RES_TIME = ?, ERR_CODE = ?, ERR_DESC = ? WHERE BCCS_ID = ?
+        </updateBccsChargeLog>
+        <updateMsspStatusByIsdnWhenReopenService>
+            UPDATE MSSP_STATUS SET OLD_STATUS = MSSP_STATUS, MSSP_STATUS = ?, END_DATE = ? WHERE ISDN = ?
+        </updateMsspStatusByIsdnWhenReopenService>
+    </sql>
+	
+    <!-- Config key MSSP -->
+    <key>
+        <!--    <privateKey>MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBALPIVn5k54w6LXZCQpqF9A2rCTDKF4cg1kjdIZQfArzKe+ZNNcwPlPe3t+c4np70yejUvxF8FL+Lw81r21sEeu0DO2xcNQXQKwqMX+p4DBpERYV/wOJaXE50lHdKGWCyFf+ZoP8Kcx2Ax+ePA7K1WPUTYxERg4i3DqNBKwNItSrjAgMBAAECgYBoUm8GRu0prLSms8pMOkClEcNygUJn0gEmJNMQTXJcNK7ys4jtEXmiyQO481zv5iGnrpP0xGiRwbtr3xNZXF8rYHF7dy16IYyHrIdQNO/mbJcbtwVY/hAcUrYqQSatBDAp91xeSS3XeXS81bVgRnLta3tefdSsVASXcKR8LS8LGQJBAPIZFTVjTKI1DHVxwiWx+IoreckREBPFGhvL9F1zxbkcY7iOdMYiMb7X5i4Y4j9yYqStWG7PP9dkjCWdYXhgBfcCQQC+GzLeutOl/wgekiTEAmwDxtOM1dr9k+/fg9knyQ9kPlhlpPUCAE+j/lQYQrJibKsfIQnKqZtrgK4y/KAqsNd1AkEAu4aKUwxTs+F7gQ1Y4XH1nrEGaKR625V1H8rfwfOHWFeRNsfB1CdweO8rMNG9jn+/wOc09MA8J0+O7yP0+BUJCQJBAKlUwrf/w5vdEVdhp1vsKFgo1rBgoII0LnpyD5BPl+UbX1OSXiYdLtMNK8y8Q/ZFgxrkK7uX3XchFIkX2naMNC0CQQC5u1fKgdGlVBr21TSXhSvXZDSiIp7xANuU85Yuz3ufPjELYk/leWhGMZ/OU/hbvo/yfxicyck7ntJcycfqJWpH</privateKey> -->
+        <privateKey>f0f9b9fc7f8b324ddcf91c86943fc892eb174032a2c592080c2cbd41f2b6ab17d2c7a417cce27fcf45fb2178267b8adb9476fc7eb41a1e7dd48d65f695f946a520e64df2c4b80072abb213bdc802ad2ff56a075a940714abcc87bb8b57d5c1eadf40eda203066e42bc4a3578c0b02fb02286fcdd95fccc92de7816d25131d774fb6330551c20f729afc6672921687307785e9c3ca369dd6aa60523e897867938bb249b1f8cd69ccc9d8bf5a053cc25b28bd2d209d10c871c58d5bb9e36fd6834aa54c37227765a9301fb870be923beb004f70599cc4f62f2685495bd0604630087598672ce50f4ab9bb9e8c92c4d44d771b247eb5d5a1143552d461761c0d6ef2915d89fa3ef027e3f3796714dfd3f3efa8270faa097a0731accef04783848e2fb0acb61389d215e27e5f972e31c264e157367da8bc787316ac9967b86a15bb71021dd2edd7016c397167a1a2775d284b58a6efee003007138855730377de5af8498148019b64552ebf7565de47826c299119ed575fdd66e2072d1697ef384c121af746b7345bb29ad5c2c45b3196507e9f3218985f5679c12b309d4ee2fe04ad69af85beb0218961c37499025bb855a096c23c7e699ed150d2c0121350e0de6615fb0ab48091208805043f8243036971cae710c8fc2e300eb0acb0e7556e6300377f9231aa70616991762513999c04a4d8c2ecbe283d59672f1f0bff0ef068c92018a62b9b28b287afca54597ead2dd15b117dadb59e064594ceff92c7227e0104f1b3550600622a58a81391036c541137698fc0054ee381d00cfa17bc43842d4e5810ddee7041a6b00155e6a1d5be3cb1ebc97425a931a84e962471bc4aa0c71efeef92bbf75a2a0991cdf0a6d006fe7e8e0444a04cfc67e9e7393834ef74beb76ecacc8615ac98a345753d35996d7b19e7733e41b8c96d53d6bf578ee04be2b1661463d9665900582239ae0d3631cde1c025529b6eadb4341cd4c5a352c60db984ed90c7d2c91b5c5a759f119d96a7ef1465dc613a459f03cddba241d28343330d6f1824cbd3a5dcceb132fd3b43c1ead78cdd00eebfc9703371ab439ba04dda2bca7829f1def8f52cda784ae9e39437c81b595461b783e0bc18846b179a324847354139cf8a92df66e4c99f86a0343db90629694c873a50e76b92f370f7b00a4e92fb635cc84d35d4d4af91d6bcc4687ccba21e07165</privateKey>
+        <publicKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrg93mDZ2w9gRqfRgeqaZyA8ygPtum2Q3x5BJfzRR1mi4ZdgS/yLjF91kgIx+LruLJoOQ8ReVddgsozuKdqINtPHkEuHVnS7c9H/AJJHh21YFq/bNBNK54Awc4OzTteLYpGCMeJf6sH80HoOk02wbeUH91HSL01W8QE16DM0m2jQIDAQAB</publicKey>
+    </key>
+	
+    <!-- SEQENCES constant name -->
+    <sequences>
+        <reqIdVcLog>REQ_ID_VC_LOG_SEQ</reqIdVcLog>
+        <idMt>ID_MT_SEQ</idMt>
+        <reqIdMsspLog>REQ_ID_MSSP_LOG_SEQ</reqIdMsspLog>
+        <transId>TRANS_ID_SEQ</transId>
+        <bccsLog>BCCS_ID_LOG_CHARGE_SEQ</bccsLog>
+    </sequences>
+	
+    <!-- Config key sms content mapping -->
+    <keySmsContent>
+        <autoFirstError comment="key sms khi gui tru tien auto that bai lan dau tien">1</autoFirstError>
+        <autoLastError comment="key sms khi gui tru tien auto that bai lan 58-59">2</autoLastError>
+        <autoFail comment="key sms khi gui tru tien au to that bai lan 59-60">6</autoFail>
+        <autoUnlockSuccess comment="key sms khi unlock thanh cong">7</autoUnlockSuccess>
+        <autoSuccess comment="key sms khi tru tien thanh cong">3</autoSuccess>
+        <smsErrorCancel comment="key sms khi TT mobile CA bi huy">4</smsErrorCancel>
+        <smsErrorCharge comment="key sms khi tru tien nhan tin that bai lan 58-59">5</smsErrorCharge>
+        <smsErrorSyntax comment="key sms error syntax">8</smsErrorSyntax>
+        <auto30TimesError comment="key sms khi gui tru tien auto that bai lan thu 30">9</auto30TimesError>
+    </keySmsContent>
+	
+    <!-- Config RA -->
+    <raTransInfo>
+        <msspId>Viettel</msspId>
+        <proCodeUnlock comment="unlock MSSP">300002</proCodeUnlock>
+        <proCodeLock comment="lock MSSP">300001</proCodeLock>
+        <proCodeCancel comment="cancel MSSP">300003</proCodeCancel>
+        <apId>OCS</apId>
+        <charset>ISO-8859-1</charset>
+    </raTransInfo>
+</config>
