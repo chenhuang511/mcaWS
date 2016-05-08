@@ -1,4 +1,4 @@
-package com.tecapro.mobileca;
+package com.sds.mobileca;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;

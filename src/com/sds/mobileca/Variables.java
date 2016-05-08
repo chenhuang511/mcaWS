@@ -1,9 +1,5 @@
-package com.tecapro.mobileca;
+package com.sds.mobileca;
 
-/**
- * @author Le Duy Thanh
- *
- */
 public class Variables {
 
 	public static final String TYPE_PDF = "pdf";

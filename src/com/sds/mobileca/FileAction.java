@@ -1,4 +1,4 @@
-package com.tecapro.mobileca;
+package com.sds.mobileca;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,12 +8,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-
-/**
- * @author Le Duy Thanh
- *
- */
 
 public class FileAction {
 	
@@ -37,7 +31,7 @@ public class FileAction {
 	public static String createFilePathByTime(String fileStatus, String fileType) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
 		Date date = new Date();
-		return System.getProperty("catalina.base") + "/wtpwebapps/MobileCA-WS/etc/" + fileStatus + "/"
+		return System.getProperty("catalina.base") + "/webapps/MobileCA-WS/etc/" + fileStatus + "/"
 				+ dateFormat.format(date) + "." + fileType;
 	}
 
