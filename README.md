@@ -1,4 +1,4 @@
-# mcaWS
+#mcaWS
 Digital signing webservice for Viettel mobile CA
 
 
@@ -17,3 +17,6 @@ Digital signing webservice for Viettel mobile CA
     fileName: the result of step 1. Valid file extentions are: pdf, xlsx, docx, xml.
   
   The result: base64 string of signed file
+
+#Distribution
+Publish war file in dist folder on Tomcat/Glassfish/...
