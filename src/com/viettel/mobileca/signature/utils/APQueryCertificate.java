@@ -30,7 +30,7 @@ import org.bouncycastle.util.encoders.Base64;
  */
 public class APQueryCertificate {
 	
-	public static String onProcess(String phoneNumber) throws Exception {
+	public static List<String> onProcess(String phoneNumber) throws Exception {
 
 		APWs apPort = APGetPort.getPort(Constants.URL_WS);
 		TransactionInfo tInfo = new TransactionInfo();
@@ -50,7 +50,7 @@ public class APQueryCertificate {
 		tInfo.setMac(mac);
 		TransactionInfo resTran;
 		resTran = apPort.certificateQuery(tInfo);
-		return resTran.getCertList().get(0);
+		return resTran.getCertList();
 		
 		
 	}

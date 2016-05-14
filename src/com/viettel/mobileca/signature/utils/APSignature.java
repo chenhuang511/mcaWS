@@ -19,7 +19,7 @@ import java.util.Date;
  */
 public class APSignature {
 
-    public static String onProcess(String hash) throws Exception {
+    public static String onProcess(String hash, String phoneNumber) throws Exception {
         APWs apPort = APGetPort.getPort(Constants.URL_WS);
         TransactionInfo tInfo = new TransactionInfo();
         tInfo.setApId(Constants.AP_ID);
@@ -30,7 +30,8 @@ public class APSignature {
         tInfo.setMsspId("Viettel");
         df = new SimpleDateFormat("yyyyMMddHHmmss");
         tInfo.setReqDate(df.format(new Date()));
-        tInfo.setMsisdn(Constants.MSISDN);
+//        tInfo.setMsisdn(Constants.MSISDN);
+        tInfo.setMsisdn(phoneNumber);
         tInfo.setDataSign(hash);
         tInfo.setDataDisplay("ky van ban");
         tInfo.setMsgMode("SYNC");

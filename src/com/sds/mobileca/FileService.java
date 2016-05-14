@@ -19,6 +19,11 @@ import com.sun.jersey.multipart.FormDataParam;
 
 @Path("/file")
 public class FileService {
+	
+	public static final String TYPE_PDF = "1";
+	public static final String TYPE_XLSX = "2";
+	public static final String TYPE_DOCX = "3";
+	public static final String TYPE_XML = "4";
 
 	@POST
 	@Path("/upload")
@@ -27,6 +32,8 @@ public class FileService {
 			@FormDataParam("file") FormDataContentDisposition fileDetail) {
 
 		String fileType = getExt(fileDetail.getFileName());
+		if(fileType == null)
+			return Response.status(200).entity("Unsupported type").build();
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
 		Date date = new Date();
 		String fileSaved = dateFormat.format(date) + "." + fileType;
@@ -43,7 +50,19 @@ public class FileService {
 	// parse to get ext of file
 	private String getExt(String fileName) {
 		String[] s = fileName.split("\\.");
-		return s[s.length - 1];
+		String tmp = s[s.length - 1];
+		tmp = tmp.toLowerCase();
+		if(tmp.equals("pdf")) {
+			return TYPE_PDF;
+		} else if(tmp.equals("xlsx")) {
+			return TYPE_XLSX;
+		} else if(tmp.equals("docx")) {
+			return TYPE_DOCX;
+		} else if(tmp.equals("xlsx")) {
+			return TYPE_XML;
+		} else {
+			return null;
+		}
 	}
 
 	// save uploaded file to new location

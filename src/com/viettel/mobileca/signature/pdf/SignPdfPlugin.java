@@ -12,6 +12,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
 
+import com.sds.mobileca.Base64Utils;
+
 /**
  *
  * @author chungnv14
@@ -42,7 +44,7 @@ public class SignPdfPlugin extends SignFilePlugin {
     @Override
     public void insertSignature(String extSig, String destFile) throws Exception {
         PDFServerClientSignature pdfSig = new PDFServerClientSignature();
-        pdfSig.insertSignature(tmpFile, destFile, "nntSignField", hash, Base64.decode(extSig), chain, signDate);
+        pdfSig.insertSignature(tmpFile, destFile, "nntSignField", hash, Base64Utils.base64Decode(extSig), chain, signDate);
         (new File(tmpFile)).delete();
     }
 

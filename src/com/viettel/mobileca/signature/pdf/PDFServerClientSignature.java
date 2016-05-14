@@ -94,6 +94,8 @@ public class PDFServerClientSignature {
         }
         bb.writeTo(os);
         StreamUtil.CopyBytes(readerSource, gaps[2] - 1, gaps[3] + 1, os);
+        os.close();
+        bb.close();
     }
 
     public List<byte[]> createHash(String src, String tempFile, Certificate[] chain,
