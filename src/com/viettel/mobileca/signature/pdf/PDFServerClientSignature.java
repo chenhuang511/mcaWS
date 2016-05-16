@@ -139,6 +139,7 @@ public class PDFServerClientSignature {
     private void emptySignature(String src, String dest, String fieldname, Certificate[] chain, String reason, String location) throws IOException, DocumentException, GeneralSecurityException {
         BouncyCastleProvider providerBC = new BouncyCastleProvider();
         Security.addProvider(providerBC);
+        PdfReader.unethicalreading = true;
         PdfReader reader = new PdfReader(src);
         FileOutputStream os = new FileOutputStream(dest);
         PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');

@@ -65,84 +65,88 @@ public class SignService {
 	@GET
 	@Produces({ MediaType.TEXT_PLAIN })
 	public String signFile(@PathParam("phoneNumber") String phoneNumber, @PathParam("fileName") String fileName,
-			@PathParam("serial") String serial) throws Exception {
-		String fileToSign = System.getProperty("catalina.base") + Variables.FOlDER_DOC + Variables.FOLDER_FILE_RECEIVED
-				+ "/" + fileName;
+			@PathParam("serial") String serial) {
+		try {
+			String fileToSign = System.getProperty("catalina.base") + Variables.FOlDER_DOC
+					+ Variables.FOLDER_FILE_RECEIVED + "/" + fileName;
 
-		List<String> userList = APQueryCertificate.onProcess(phoneNumber);
-		vtCertString = "MIIEKDCCAxCgAwIBAgIKYQWvMwAAAAAABzANBgkqhkiG9w0BAQUFADB+MQswCQYDVQQGEwJWTjEzMDEGA1UEChMqTWluaXN0cnkgb2YgSW5mb3JtYXRpb24gYW5kIENvbW11bmljYXRpb25zMRswGQYDVQQLExJOYXRpb25hbCBDQSBDZW50ZXIxHTAbBgNVBAMTFE1JQyBOYXRpb25hbCBSb290IENBMB4XDTEwMTAyMDA3MTcwMVoXDTE1MTAyMDA3MjcwMVowOjELMAkGA1UEBhMCVk4xFjAUBgNVBAoTDVZpZXR0ZWwgR3JvdXAxEzARBgNVBAMTClZpZXR0ZWwtQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCd2dP6MvFT0bchdUYheo8Hw8JEPRzc/ngSv+JCSlZMQBXV2wA0rTFX97n2bwjOFcQQyS/x0xNXq11fU65bOs+XNiwTpZ9BgGWcPxXxFql2wgNUuDdfue47fMMjGFGWIpfne5+0Oxn323oKmNRSKd5asVuCz/Fv0eOqUduWBBl5jcWgU5iAkIb4+ZgN7iQx6mcwwSZ3/ozI9Oq4iPLNAOc7otDahckDUmfhmutUtMcuKYBUys3Nlz4LPNV9DCifc82uTvzdcXg144pHlFEJZVNbFLIHTbHiw/QhTPLHUVnVde46Jqq336RSTbXEvKEXIMiCg4K1/1tBErY1ZeHO42BNAgMBAAGjgeswgegwCwYDVR0PBAQDAgGGMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFIVcBEHcRwZwAhTlzC523nLeRdaFMB8GA1UdIwQYMBaAFM1iceRhvf497LJAYNOBdd06rGvGMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9wdWJsaWMucm9vdGNhLmdvdi52bi9jcmwvbWljbnJjYS5jcmwwRwYIKwYBBQUHAQEEOzA5MDcGCCsGAQUFBzAChitodHRwOi8vcHVibGljLnJvb3RjYS5nb3Yudm4vY3J0L21pY25yY2EuY3J0MA0GCSqGSIb3DQEBBQUAA4IBAQB2/74l0LDdM4tqc1zOZqvzdYzETSB2IdOtOpStAkrIUYM4VSK8tbbmTPl0Zsowyx9mDmYwmMLuNoju75vwHjYldcUiE2xkMrCbRQpx+F1yeKe0vkWo78Xo9UlUV2LXH739I+x/D5wtHXXNmbx5fRXwztFaJFgRVOLKi5l9+4iis4wmDxI1Jq/K0yirNC/NwQlOI83g+xB/80T13M3hjY7iMA1Y7Gf/uUZztn3S3+AVL7J5W/TVHXC8Tshizvt816Re5GdQ+GMqEFV5q4ttdujbwjiYbMz1QIRlAREmxGBRi61mBmEZVdeAHF/VDT/u7hs41TjbdrWrqNIVjBI07xRX";
-		CertificateFactory cf = CertificateFactory.getInstance("X.509");
-		X509Certificate userCert = getCertFromSerial(serial, userList);
-		if (userCert == null) {
-			return ERR_SERIAL_INVALID;
-		}
-		X509Certificate viettelCert = (X509Certificate) cf
-				.generateCertificate(new ByteArrayInputStream(Base64.decode(vtCertString.getBytes())));
-		Certificate[] chain = new Certificate[] { userCert, viettelCert };
-		String fileExt = getExt(fileName);
-		if (fileExt.equals(FileService.TYPE_DOCX) || fileExt.equals(FileService.TYPE_XLSX)) {
-			List<X509Certificate> lstCert = new ArrayList<X509Certificate>();
-			for (Certificate cert : chain) {
-				X509Certificate xc = (X509Certificate) cert;
-				lstCert.add(xc);
+			List<String> userList = APQueryCertificate.onProcess(phoneNumber);
+			vtCertString = "MIIEKDCCAxCgAwIBAgIKYQWvMwAAAAAABzANBgkqhkiG9w0BAQUFADB+MQswCQYDVQQGEwJWTjEzMDEGA1UEChMqTWluaXN0cnkgb2YgSW5mb3JtYXRpb24gYW5kIENvbW11bmljYXRpb25zMRswGQYDVQQLExJOYXRpb25hbCBDQSBDZW50ZXIxHTAbBgNVBAMTFE1JQyBOYXRpb25hbCBSb290IENBMB4XDTEwMTAyMDA3MTcwMVoXDTE1MTAyMDA3MjcwMVowOjELMAkGA1UEBhMCVk4xFjAUBgNVBAoTDVZpZXR0ZWwgR3JvdXAxEzARBgNVBAMTClZpZXR0ZWwtQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCd2dP6MvFT0bchdUYheo8Hw8JEPRzc/ngSv+JCSlZMQBXV2wA0rTFX97n2bwjOFcQQyS/x0xNXq11fU65bOs+XNiwTpZ9BgGWcPxXxFql2wgNUuDdfue47fMMjGFGWIpfne5+0Oxn323oKmNRSKd5asVuCz/Fv0eOqUduWBBl5jcWgU5iAkIb4+ZgN7iQx6mcwwSZ3/ozI9Oq4iPLNAOc7otDahckDUmfhmutUtMcuKYBUys3Nlz4LPNV9DCifc82uTvzdcXg144pHlFEJZVNbFLIHTbHiw/QhTPLHUVnVde46Jqq336RSTbXEvKEXIMiCg4K1/1tBErY1ZeHO42BNAgMBAAGjgeswgegwCwYDVR0PBAQDAgGGMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFIVcBEHcRwZwAhTlzC523nLeRdaFMB8GA1UdIwQYMBaAFM1iceRhvf497LJAYNOBdd06rGvGMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9wdWJsaWMucm9vdGNhLmdvdi52bi9jcmwvbWljbnJjYS5jcmwwRwYIKwYBBQUHAQEEOzA5MDcGCCsGAQUFBzAChitodHRwOi8vcHVibGljLnJvb3RjYS5nb3Yudm4vY3J0L21pY25yY2EuY3J0MA0GCSqGSIb3DQEBBQUAA4IBAQB2/74l0LDdM4tqc1zOZqvzdYzETSB2IdOtOpStAkrIUYM4VSK8tbbmTPl0Zsowyx9mDmYwmMLuNoju75vwHjYldcUiE2xkMrCbRQpx+F1yeKe0vkWo78Xo9UlUV2LXH739I+x/D5wtHXXNmbx5fRXwztFaJFgRVOLKi5l9+4iis4wmDxI1Jq/K0yirNC/NwQlOI83g+xB/80T13M3hjY7iMA1Y7Gf/uUZztn3S3+AVL7J5W/TVHXC8Tshizvt816Re5GdQ+GMqEFV5q4ttdujbwjiYbMz1QIRlAREmxGBRi61mBmEZVdeAHF/VDT/u7hs41TjbdrWrqNIVjBI07xRX";
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			X509Certificate userCert = getCertFromSerial(serial, userList);
+			if (userCert == null) {
+				return ERR_SERIAL_INVALID;
 			}
-			String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT, fileExt);
-			XMLOfficeSignature.initial();
-			byte[] hash = XMLOfficeSignature.hash(lstCert, fileToSign);
-			String signature = APSignature.onProcess(new String(Base64.encode(hash)), phoneNumber);
-			if (signature == null) {
-				for (int i = 0; i < 10;) {
-					signature = APSignature.onProcess(new String(Base64.encode(hash)), phoneNumber);
-					if (signature != null)
-						break;
-					else
-						i++;
+			X509Certificate viettelCert = (X509Certificate) cf
+					.generateCertificate(new ByteArrayInputStream(Base64.decode(vtCertString.getBytes())));
+			Certificate[] chain = new Certificate[] { userCert, viettelCert };
+			String fileExt = getExt(fileName);
+			if (fileExt.equals(FileService.TYPE_DOCX) || fileExt.equals(FileService.TYPE_XLSX)) {
+				List<X509Certificate> lstCert = new ArrayList<X509Certificate>();
+				for (Certificate cert : chain) {
+					X509Certificate xc = (X509Certificate) cert;
+					lstCert.add(xc);
 				}
-			}
-			byte[] signatureValue = Base64.decode(signature);
-			XMLOfficeSignature.insertSignature(signatureValue, destinationFilePath, lstCert);
-			String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
-			return b64DestinationFile;
-		} else if (fileExt.equals(FileService.TYPE_PDF)) {
-			SignFilePlugin sfp = new SignPdfPlugin();
-			String hash = sfp.createHash(fileToSign, chain);
-			String sig = APSignature.onProcess(hash, phoneNumber);
-			if (sig == null) {
-				for (int i = 0; i < 10;) {
-					sig = APSignature.onProcess(hash, phoneNumber);
-					if (sig != null)
-						break;
-					else
-						i++;
+				String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT, fileExt);
+				XMLOfficeSignature.initial();
+				byte[] hash = XMLOfficeSignature.hash(lstCert, fileToSign);
+				String signature = APSignature.onProcess(new String(Base64.encode(hash)), phoneNumber);
+				if (signature == null) {
+					for (int i = 0; i < 10;) {
+						signature = APSignature.onProcess(new String(Base64.encode(hash)), phoneNumber);
+						if (signature != null)
+							break;
+						else
+							i++;
+					}
 				}
-			}
-			String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT,
-					Variables.TYPE_PDF);
-			sfp.insertSignature(sig, destinationFilePath);
-			String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
-			// FileAction.deleteFile(filePath);
-			return b64DestinationFile;
-		} else if (fileExt.equals(FileService.TYPE_XML)) {
-			String tempPath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_TEMP, Variables.TYPE_XML);
-			String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT,
-					Variables.TYPE_XML);
-			byte[] hash = XmlDigitalSignature.getInstance().createDigestSDS(fileToSign, tempPath, chain);
-			byte[] hashSha1 = HashSHA1.hash(hash);
-			String sig = APSignature.onProcess(new String(Base64.encode(hashSha1)), phoneNumber);
-			if (sig == null) {
-				for (int i = 0; i < 10;) {
-					sig = APSignature.onProcess(new String(Base64.encode(hashSha1)), phoneNumber);
-					if (sig != null)
-						break;
-					else
-						i++;
+				byte[] signatureValue = Base64.decode(signature);
+				XMLOfficeSignature.insertSignature(signatureValue, destinationFilePath, lstCert);
+				String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
+				return b64DestinationFile;
+			} else if (fileExt.equals(FileService.TYPE_PDF)) {
+				SignFilePlugin sfp = new SignPdfPlugin();
+				String hash = sfp.createHash(fileToSign, chain);
+				String sig = APSignature.onProcess(hash, phoneNumber);
+				if (sig == null) {
+					for (int i = 0; i < 10;) {
+						sig = APSignature.onProcess(hash, phoneNumber);
+						if (sig != null)
+							break;
+						else
+							i++;
+					}
 				}
+				String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT,
+						Variables.TYPE_PDF);
+				sfp.insertSignature(sig, destinationFilePath);
+				String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
+				// FileAction.deleteFile(filePath);
+				return b64DestinationFile;
+			} else if (fileExt.equals(FileService.TYPE_XML)) {
+				String tempPath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_TEMP, Variables.TYPE_XML);
+				String destinationFilePath = FileAction.createFilePathByTime(Variables.FOLDER_FILE_SENT,
+						Variables.TYPE_XML);
+				byte[] hash = XmlDigitalSignature.getInstance().createDigestSDS(fileToSign, tempPath, chain);
+				byte[] hashSha1 = HashSHA1.hash(hash);
+				String sig = APSignature.onProcess(new String(Base64.encode(hashSha1)), phoneNumber);
+				if (sig == null) {
+					for (int i = 0; i < 10;) {
+						sig = APSignature.onProcess(new String(Base64.encode(hashSha1)), phoneNumber);
+						if (sig != null)
+							break;
+						else
+							i++;
+					}
+				}
+				XmlDigitalSignature.getInstance().insertSignature(tempPath, destinationFilePath, Base64.decode(sig));
+				String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
+				return b64DestinationFile;
+			} else {
+				return "Unsuported file type";
 			}
-			XmlDigitalSignature.getInstance().insertSignature(tempPath, destinationFilePath, Base64.decode(sig));
-			String b64DestinationFile = FileAction.fileEncode(destinationFilePath);
-			return b64DestinationFile;
-		} else {
-			return "Unsuported file type";
+		} catch (Exception e) {
+			return e.getMessage();
 		}
 
 	}
