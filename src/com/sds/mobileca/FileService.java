@@ -37,7 +37,7 @@ public class FileService {
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
 		Date date = new Date();
 		String fileSaved = dateFormat.format(date) + "." + fileType;
-		String uploadedFileLocation = System.getProperty("catalina.base") + "/webapps/MobileCA-WS/etc/"
+		String uploadedFileLocation = System.getProperty("catalina.base") + Variables.FOlDER_DOC
 				+ Variables.FOLDER_FILE_RECEIVED + "/" + fileSaved;
 
 		// save it
@@ -58,7 +58,7 @@ public class FileService {
 			return TYPE_XLSX;
 		} else if(tmp.equals("docx")) {
 			return TYPE_DOCX;
-		} else if(tmp.equals("xlsx")) {
+		} else if(tmp.equals("xml")) {
 			return TYPE_XML;
 		} else {
 			return null;

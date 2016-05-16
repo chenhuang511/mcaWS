@@ -31,7 +31,7 @@ public class FileAction {
 	public static String createFilePathByTime(String fileStatus, String fileType) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
 		Date date = new Date();
-		return System.getProperty("catalina.base") + "/webapps/MobileCA-WS/etc/" + fileStatus + "/"
+		return System.getProperty("catalina.base") + Variables.FOlDER_DOC + fileStatus + "/"
 				+ dateFormat.format(date) + "." + fileType;
 	}
 

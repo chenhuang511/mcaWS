@@ -7,5 +7,6 @@ public class Variables {
 	public static final String FOLDER_FILE_RECEIVED = "received";
 	public static final String FOLDER_FILE_SENT = "sent";
 	public static final String FOLDER_FILE_TEMP = "temp";
+	public static final String FOlDER_DOC = "/webapps/MobileCA-WS/etc/";
 	
 }
